@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 PWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# shellcheck source=bashtap.bash
 source "${PWD}/../../bashtap.bash"
 
 plan

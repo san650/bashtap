@@ -1,0 +1,19 @@
+version: 2.1
+
+orbs:
+  shellcheck: circleci/shellcheck@1.3.9
+
+jobs:
+  test:
+    docker:
+      - image: debian:stretch
+    steps:
+      - checkout
+      - run:
+          name: Test
+          command: ./test/test.sh
+workflows:
+  shellcheck:
+    jobs:
+      - shellcheck/check
+      - test
