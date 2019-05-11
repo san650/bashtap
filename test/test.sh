@@ -44,4 +44,8 @@ not ok 2 second test
 ok 3 third test
 EOT
 
+spec "using string"
+expect <<< 'echo hello world'
+to_output <<< 'hello world'
+
 finish

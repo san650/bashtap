@@ -39,6 +39,41 @@ $ ./test.sh
 ok 1 echo hello world
 ```
 
+## Usage
+
+Include this library in your project, you can use git submodules for that.
+
+```
+$ cd my-project
+$ mkdir deps
+$ git submodule add https://github.com/san650/bashtap deps/bashtap
+```
+
+Then include the library in your test script `./test.sh`
+
+```sh
+#!/usr/bin/env bash
+
+PWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "${PWD}/deps/bashtap/bashtap.bash"
+
+spec "echo outputs arguments"
+
+expect <<< 'echo hello world'
+to_output <<< 'hello world'
+
+finish
+```
+
+Make your test file executable and run it
+
+```sh
+$ chmod +x test.sh
+$ ./test.sh
+1..1
+ok 1 echo outputs arguments
+```
+
 ## API
 
 | Function | Arguments | Description |
