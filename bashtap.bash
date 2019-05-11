@@ -2,13 +2,12 @@
 
 TEST_INDEX="$1"
 STATUS_EXIT=0
-TODO_DB_PATH=
-TMP_OUTPUT=
-TODO="$(pwd)/bin/todo"
+EXPECTED_OUTPUT_PATH=
+ACTUAL_OUTPUT_PATH=
 TEST_COUNTER=0
 CURRENT_TEST=
 EXPECTED_OUTPUT=
-ACTUAL_OUTPUT_FILE_FILE=
+ACTUAL_OUTPUT=
 
 function plan {
   # Count the numbers of `spec` calls in the file
@@ -22,8 +21,8 @@ function plan {
 }
 
 function cleanup {
-  rm -rf "$TODO_DB_PATH"
-  rm -rf "$TMP_OUTPUT"
+  rm -rf "$EXPECTED_OUTPUT_PATH"
+  rm -rf "$ACTUAL_OUTPUT_PATH"
 }
 
 trap cleanup EXIT
@@ -61,12 +60,11 @@ function spec {
     return
   fi
 
-  TODO_DB_PATH=$(mktemp -d -t todo-test-XXXXXXX)
-  TMP_OUTPUT="$(mktemp -d -t todo-test-output-XXXXXXX)/output"
+  EXPECTED_OUTPUT_PATH=$(mktemp -d -t bashtap-expected-output-XXXXXXX)
+  ACTUAL_OUTPUT_PATH="$(mktemp -d -t bashtap-actual-output-XXXXXXX)"
   CURRENT_TEST="$1"
-  EXPECTED_OUTPUT="$TODO_DB_PATH/test-$TEST_COUNTER-expected-output"
-  ACTUAL_OUTPUT_FILE_FILE="$TMP_OUTPUT/test-$TEST_COUNTER-actual-output"
-  mkdir -p "$TMP_OUTPUT"
+  EXPECTED_OUTPUT="$EXPECTED_OUTPUT_PATH/test-$TEST_COUNTER-expected-output"
+  ACTUAL_OUTPUT="$ACTUAL_OUTPUT_PATH/test-$TEST_COUNTER-actual-output"
 }
 
 function expect {
@@ -78,17 +76,12 @@ function expect {
     return
   fi
 
-  # Cleanup all variables before running a test
-  TODO_PATH=
-  TODO_PROJECT=
-  TODO_FILTER=
-
-  eval "$TEST" 2>&1 > $ACTUAL_OUTPUT_FILE_FILE
+  eval "$TEST" 2>&1 > $ACTUAL_OUTPUT
 }
 
 function to_output {
   local EXPECTED=$(cat)
-  local ACTUAL=$(cat $ACTUAL_OUTPUT_FILE_FILE)
+  local ACTUAL=$(cat $ACTUAL_OUTPUT)
   local NUMBER=${TEST_COUNTER}
 
   # If test index is set, skipt the test if it's not the right index
