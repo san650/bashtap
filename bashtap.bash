@@ -1,17 +1,19 @@
+#!/usr/bin/env bash
+
 # TAP = Test Anything Protocol http://testanything.org/
 
 TEST_INDEX="$1"
 STATUS_EXIT=0
-EXPECTED_OUTPUT_PATH=
 ACTUAL_OUTPUT_PATH=
 TEST_COUNTER=0
 CURRENT_TEST=
-EXPECTED_OUTPUT=
 ACTUAL_OUTPUT=
 
 function plan {
   # Count the numbers of `spec` calls in the file
-  local TOTAL=$(grep --count "^spec " "$0")
+  local TOTAL
+
+  TOTAL=$(grep --count "^spec " "$0")
 
   if [ -n "$TEST_INDEX" ]; then
     TOTAL=1
@@ -21,7 +23,6 @@ function plan {
 }
 
 function cleanup {
-  rm -rf "$EXPECTED_OUTPUT_PATH"
   rm -rf "$ACTUAL_OUTPUT_PATH"
 }
 
@@ -38,10 +39,10 @@ function tap_not_ok()
 
   # print diagnostics
   echo "#      EXPECTED:"
-  echo "$3" | sed 's/^/#      /'
+  echo "${3/#/#      }"
   echo "#"
   echo "#      ACTUAL:"
-  echo "$4" | sed 's/^/#      /'
+  echo "${4/#/#      }"
 
   STATUS_EXIT=1
 }
@@ -56,33 +57,37 @@ function spec {
 
   # If test index is set, skipt the test if it's not the right index
   # This allows to run one test at a time: `./test.sh 3`
-  if [ -n "$TEST_INDEX" -a "$TEST_INDEX" != "$TEST_COUNTER" ]; then
+  if [ -n "$TEST_INDEX" ] && [ "$TEST_INDEX" != "$TEST_COUNTER" ]; then
     return
   fi
 
-  EXPECTED_OUTPUT_PATH=$(mktemp -d -t bashtap-expected-output-XXXXXXX)
   ACTUAL_OUTPUT_PATH="$(mktemp -d -t bashtap-actual-output-XXXXXXX)"
   CURRENT_TEST="$1"
-  EXPECTED_OUTPUT="$EXPECTED_OUTPUT_PATH/test-$TEST_COUNTER-expected-output"
   ACTUAL_OUTPUT="$ACTUAL_OUTPUT_PATH/test-$TEST_COUNTER-actual-output"
 }
 
 function expect {
-  local TEST=$(cat)
+  local TEST
+
+  TEST=$(cat)
 
   # If test index is set, skipt the test if it's not the right index
   # This allows to run one test at a time: `./test.sh 3`
-  if [ -n "$TEST_INDEX" -a "$TEST_INDEX" != "$TEST_COUNTER" ]; then
+  if [ -n "$TEST_INDEX" ] && [ "$TEST_INDEX" != "$TEST_COUNTER" ]; then
     return
   fi
 
-  eval "$TEST" 2>&1 > $ACTUAL_OUTPUT
+  eval "$TEST" > "$ACTUAL_OUTPUT" 2>&1
 }
 
 function to_output {
-  local EXPECTED=$(cat)
-  local ACTUAL=$(cat $ACTUAL_OUTPUT)
-  local NUMBER=${TEST_COUNTER}
+  local EXPECTED
+  local ACTUAL
+  local NUMBER
+
+  EXPECTED=$(cat)
+  ACTUAL=$(cat "$ACTUAL_OUTPUT")
+  NUMBER=${TEST_COUNTER}
 
   # If test index is set, skipt the test if it's not the right index
   # This allows to run one test at a time: `./test.sh 3`
