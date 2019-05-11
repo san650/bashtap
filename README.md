@@ -79,8 +79,8 @@ ok 1 echo outputs arguments
 | Function | Arguments | Description |
 | -------- | --------- | ----------- |
 | `plan`   | None | Prints TAP header |
-| `spec`   | $1:String | Defines a new name |
-| `expect` | File Descriptor or a heredoc block | Script to execute |
+| `spec`   | $1:String | Defines a new test |
+| `expect` | File Descriptor or a heredoc block | Script to test |
 | `to_output` | File Descriptor or a heredoc block | Expected output from the script defined in `expect` |
 | `finish` | None | Exit the program with an error code if a test failed |
 
